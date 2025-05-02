@@ -1,6 +1,0 @@
-@PunkteSystem_HostAddress = http://localhost:5281
-
-GET {{PunkteSystem_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

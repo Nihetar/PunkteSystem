@@ -1,5 +1,0 @@
-FROM postgres
-
-ENV POSTGRES_DB=PunkteDatabase
-ENV POSTGRES_USER=PunkteUSer
-ENV POSTGRES_PASSWORD=Tv#Babenhausen
