@@ -2,15 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/Login';
 import { UpdatePage } from './pages/SchwimmerUpdate';
 import { AuswertungPage } from './pages/Auswertung';
-import { useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(Boolean(token));
-  }, []);
+  const { isAuthenticated } = useAuth();
 
   if (isAuthenticated === null) {
     return null;

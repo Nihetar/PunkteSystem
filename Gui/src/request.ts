@@ -19,7 +19,7 @@ export function withRefreshedToken<T>(
       if (error.response?.status === 401) {
         try {
           const refreshResponse = await axios.post<{ token: string }>(
-            'https://localhost:5173/api/auth/refresh',
+            'http://localhost:7075/api/auth/refresh',
             {},
             {
               headers: {
@@ -56,7 +56,7 @@ export async function request<T>(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
   content?: unknown
 ): Promise<T> {
-  const response = await requestAndRefreshToken(`https://localhost:5173/api/${urlSuffix}`, {
+  const response = await requestAndRefreshToken(`https://localhost:7075/api/${urlSuffix}`, {
     data: content,
     method,
   });

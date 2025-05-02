@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Container,
   TextField,
@@ -7,30 +6,17 @@ import {
   Box,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
 export default function LoginPage() {
-  const [login, setLogin] = useState({ username: "", password: "" });
   const navigate = useNavigate();
+  const { login } = useAuth();
+
+  // TODO: Implement real login logic
 
   const handleLogin = async () => {
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          benutzername: login.username,
-          passwortHash: login.password,
-        }),
-      });
-
-      if (res.ok) {
-        navigate("/update");
-      } else {
-        alert("Login fehlgeschlagen");
-      }
-    } catch (err) {
-      alert("Fehler beim Login");
-    }
+    login('testToken');
+    navigate('/update', { replace: true });
   };
 
   return (
@@ -39,15 +25,13 @@ export default function LoginPage() {
       <Box display="flex" flexDirection="column" gap={2}>
         <TextField
           label="Benutzername"
-          value={login.username}
-          onChange={(e) => setLogin({ ...login, username: e.target.value })}
+          value={""}
           fullWidth
         />
         <TextField
           label="Passwort"
           type="password"
-          value={login.password}
-          onChange={(e) => setLogin({ ...login, password: e.target.value })}
+          value={""}
           fullWidth
         />
         <Button variant="contained" onClick={handleLogin}>Login</Button>

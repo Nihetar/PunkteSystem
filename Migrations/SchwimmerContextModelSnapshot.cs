@@ -40,7 +40,7 @@ namespace PunkteSystem.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Gruppen");
+                    b.ToTable("gruppen", (string)null);
                 });
 
             modelBuilder.Entity("PunkteSystem.Model.Schwimmer", b =>
@@ -65,11 +65,14 @@ namespace PunkteSystem.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Punkte")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GruppeId");
 
-                    b.ToTable("Schwimmer");
+                    b.ToTable("schwimmer", (string)null);
                 });
 
             modelBuilder.Entity("PunkteSystem.Model.User", b =>
@@ -93,7 +96,7 @@ namespace PunkteSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Zeit", b =>
@@ -119,7 +122,7 @@ namespace PunkteSystem.Migrations
 
                     b.HasIndex("SchwimmerId");
 
-                    b.ToTable("Zeiten");
+                    b.ToTable("zeiten", (string)null);
                 });
 
             modelBuilder.Entity("PunkteSystem.Model.Gruppe", b =>
@@ -160,7 +163,7 @@ namespace PunkteSystem.Migrations
 
                             b1.HasKey("SchwimmerId");
 
-                            b1.ToTable("Schwimmer");
+                            b1.ToTable("schwimmer");
 
                             b1.WithOwner()
                                 .HasForeignKey("SchwimmerId");
@@ -194,7 +197,7 @@ namespace PunkteSystem.Migrations
 
                             b1.HasKey("SchwimmerId");
 
-                            b1.ToTable("Schwimmer");
+                            b1.ToTable("schwimmer");
 
                             b1.WithOwner()
                                 .HasForeignKey("SchwimmerId");
@@ -228,7 +231,7 @@ namespace PunkteSystem.Migrations
 
                             b1.HasKey("SchwimmerId");
 
-                            b1.ToTable("Schwimmer");
+                            b1.ToTable("schwimmer");
 
                             b1.WithOwner()
                                 .HasForeignKey("SchwimmerId");
@@ -265,7 +268,7 @@ namespace PunkteSystem.Migrations
 
                             b1.HasKey("SchwimmerId");
 
-                            b1.ToTable("Schwimmer");
+                            b1.ToTable("schwimmer");
 
                             b1.WithOwner()
                                 .HasForeignKey("SchwimmerId");
@@ -296,7 +299,7 @@ namespace PunkteSystem.Migrations
 
                             b1.HasKey("SchwimmerId");
 
-                            b1.ToTable("Schwimmer");
+                            b1.ToTable("schwimmer");
 
                             b1.WithOwner()
                                 .HasForeignKey("SchwimmerId");
