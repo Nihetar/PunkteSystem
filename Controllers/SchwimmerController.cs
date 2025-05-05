@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PunkteSystem.EFCore;
@@ -42,6 +42,11 @@ public class SchwimmerController(SchwimmerContext context) : ControllerBase
         if (id != schwimmer.Id)
             return BadRequest();
         context.Entry(schwimmer).State = EntityState.Modified;
+        context.Entry(schwimmer.Brust).State = EntityState.Modified;
+        context.Entry(schwimmer.Kraul).State = EntityState.Modified;
+        context.Entry(schwimmer.Ruecken).State = EntityState.Modified;
+        context.Entry(schwimmer.Grundfertigkeiten).State = EntityState.Modified;
+        context.Entry(schwimmer.Schwimmstile).State = EntityState.Modified;
         await context.SaveChangesAsync();
         return CreatedAtAction(nameof(Get), new { id = schwimmer.Id }, schwimmer);
     }
@@ -57,112 +62,58 @@ public class SchwimmerController(SchwimmerContext context) : ControllerBase
         return NoContent();
     }
 
-
     [HttpPost("SaveSwimmingData")]
     public async Task<IActionResult> SaveSwimmingDataAsync([FromBody] string inputText)
     {
-        List<string> schwimmerGruppeList = new List<string>();
-        List<string> schwimmerNameList = new List<string>();
-
-        var lines = inputText.Split(';');
+        var lines = inputText.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
             var trimmedLine = line.Trim();
+            if (string.IsNullOrWhiteSpace(trimmedLine)) continue;
 
-            if (string.IsNullOrEmpty(trimmedLine))
-                continue;
+            var parts = trimmedLine.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            var parts = trimmedLine.Split(',');
+            if (parts.Length != 4)
+                continue; // oder return BadRequest($"Ungültiges Format in: {line}");
 
-            if (parts.Length == 2)
+            var nachname = parts[0].Trim();
+            var vorname = parts[1].Trim();
+            var geburtsdatumText = parts[2].Trim();
+            var gruppe = parts[3].Trim();
+
+            if (!DateTime.TryParseExact(geburtsdatumText, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedGeburtsdatum))
+                continue; // oder return BadRequest($"Ungültiges Datum in: {geburtsdatumText}");
+
+            parsedGeburtsdatum = DateTime.SpecifyKind(parsedGeburtsdatum, DateTimeKind.Utc);
+
+            bool exists = await context.Schwimmer.AnyAsync(s =>
+                s.Vorname == vorname &&
+                s.Nachname == nachname &&
+                s.Geburtsdatum.Date == parsedGeburtsdatum.Date);
+
+            if (!exists)
             {
-                var groupName = parts[0].Trim();
-                var swimmerName = parts[1].Trim();
-
-                schwimmerGruppeList.Add(groupName);
-                schwimmerNameList.Add(swimmerName);
-            }
-        }
-
-        // Iterate over schwimmerGruppeList and schwimmerNameList
-        for (int i = 0; i < schwimmerGruppeList.Count; i++)
-        {
-            var groupName = schwimmerGruppeList[i];
-            var swimmerName = schwimmerNameList[i];
-
-            // Check if the swimmer already exists in the database
-            var exist = await context.Schwimmer
-                                     .AnyAsync(s => s.Name == swimmerName);
-
-            if (!exist)
-            {
-                var schwimmer = new Schwimmer
+                var neuerSchwimmer = new Schwimmer
                 {
-                    Brust = new Brust
-                    {
-                        ArmeNichtGestreckt = false,
-                        BeinSchere = false,
-                        GabelFinger = false,
-                        KeineSchwimmstrucktur = false,
-                        KnieAnBrust = false,
-                        KopfFalsch = false
-                    },
-
-                    Grundfertigkeiten = new Grundfertigkeiten
-                    {
-                        Atmen = false,
-                        Drehen = false,
-                        Fortbewegen = false,
-                        Gleiten = false,
-                        Rollen = false,
-                        Springen = false,
-                        Tauchen = false
-                    },
-
-                    Kraul = new Kraul
-                    {
-                        ArmeNichtGestreckt = false,
-                        ArmeUnkoodiniert = false,
-                        ArmeUnterwasserFalsch = false,
-                        AtmungFalsch = false,
-                        BeineNichtGestreckt = false,
-                        BeineUnregelmaessig = false,
-                        KopfNichtGeradeNachUnten = false
-                    },
-
-                    Ruecken = new Ruecken
-                    {
-                        ArmeNichtAmOhr = false,
-                        ArmeUnkoodiniert = false,
-                        ArmeUnterwasserFalsch = false,
-                        BauchUnten = false,
-                        BeineNichtGestreckt = false,
-                        BeineUnregelmaessig = false,
-                        HuefteNichtGerade = false,
-                        KopfNichtGerade = false
-                    },
-
-                    Schwimmstile = new Schwimmstile
-                    {
-                        GrobBrust = false,
-                        GrobKraul = false,
-                        GrobRuecken = false,
-                        KeinBrust = false,
-                        KeinKraul = false,
-                        KeinRuecken = false
-                    },
-
-                    Gruppe = groupName,
-                    Name = swimmerName,
+                    Vorname = vorname,
+                    Nachname = nachname,
+                    Geburtsdatum = parsedGeburtsdatum,
+                    Gruppe = gruppe,
+                    GruppenId = 0,
+                    Punkte = 0,
+                    Brust = new Brust(),
+                    Kraul = new Kraul(),
+                    Ruecken = new Ruecken(),
+                    Grundfertigkeiten = new Grundfertigkeiten(),
+                    Schwimmstile = new Schwimmstile()
                 };
 
-                context.Add(schwimmer);
+                context.Schwimmer.Add(neuerSchwimmer);
             }
         }
 
         await context.SaveChangesAsync();
-        return Ok(new { message = "Swimming data saved successfully." });
+        return Ok(new { message = "Schwimmerdaten erfolgreich importiert." });
     }
-
 }

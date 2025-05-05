@@ -8,7 +8,13 @@ public class Schwimmer
     public int Id { get; set; }
 
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public string Vorname { get; set; } = string.Empty;
+
+    [Required]
+    public string Nachname { get; set; } = string.Empty;
+
+    [Required]
+    public DateTime Geburtsdatum { get; set; }
 
     [Required]
     public int Punkte { get; set; }

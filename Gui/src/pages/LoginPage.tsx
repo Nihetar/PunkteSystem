@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     login('testToken');
-    navigate('/update', { replace: true });
+    navigate('/', { replace: true });
   };
 
   return (

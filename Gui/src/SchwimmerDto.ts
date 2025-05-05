@@ -49,7 +49,9 @@ export interface GrundfertigkeitenDto {
   
   export interface SchwimmerDto {
     id: number;
-    name: string;
+    vorname: string;
+    nachname: string;
+    geburtsdatum: Date;
     gruppe: string;
     grundfertigkeiten: GrundfertigkeitenDto;
     schwimmstile: SchwimmstileDto;

@@ -6,30 +6,24 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel
+  TableRow
 } from '@mui/material';
 import { getAllSchwimmer } from '../request';
 import { SiteMap } from './SiteMap';
 
 interface Schwimmer {
   id: number;
-  name: string;
+  vorname: string;
+  nachname: string;
+  geburtsdatum: string;
   gruppe: string;
   brust: Record<string, boolean>;
   kraul: Record<string, boolean>;
   ruecken: Record<string, boolean>;
 }
 
-const schwimmstile = ['brust', 'kraul', 'ruecken'] as const;
-type Schwimmstil = typeof schwimmstile[number];
-
 export function Auswertung() {
   const [data, setData] = useState<Schwimmer[]>([]);
-  const [stil, setStil] = useState<Schwimmstil>('brust');
 
   useEffect(() => {
     getAllSchwimmer()
@@ -37,33 +31,16 @@ export function Auswertung() {
       .catch(err => console.error('Ladefehler:', err));
   }, []);
 
-  const getFehlerAnzahl = (werte: Record<string, boolean>) => {
-    return Object.values(werte).filter(v => v).length;
-  };
-
   return (
     <Box p={4}>
       <SiteMap />
       <Typography variant="h5" gutterBottom>Auswertung der Schwimmstile</Typography>
-
-      <FormControl sx={{ mb: 3, minWidth: 200 }}>
-        <InputLabel id="stil-label">Schwimmstil</InputLabel>
-        <Select
-          labelId="stil-label"
-          value={stil}
-          label="Schwimmstil"
-          onChange={e => setStil(e.target.value as Schwimmstil)}
-        >
-          {schwimmstile.map(s => (
-            <MenuItem key={s} value={s}>{s.toUpperCase()}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
+            <TableCell>Nachname</TableCell>
+            <TableCell>Vorname</TableCell>
+            <TableCell>Geburtsdatum</TableCell>
             <TableCell>Gruppe</TableCell>
             <TableCell>Fehleranzahl</TableCell>
           </TableRow>
@@ -71,9 +48,11 @@ export function Auswertung() {
         <TableBody>
           {data.map(s => (
             <TableRow key={s.id}>
-              <TableCell>{s.name}</TableCell>
+              <TableCell>{s.nachname}</TableCell>
+              <TableCell>{s.vorname}</TableCell>
+              <TableCell>{new Date(s.geburtsdatum).toLocaleDateString()}</TableCell>
               <TableCell>{s.gruppe}</TableCell>
-              <TableCell>{getFehlerAnzahl(s[stil])}</TableCell>
+              <TableCell>{[...Object.values(s.brust), ...Object.values(s.kraul), ...Object.values(s.ruecken)].filter(v => v).length}</TableCell>
             </TableRow>
           ))}
         </TableBody>

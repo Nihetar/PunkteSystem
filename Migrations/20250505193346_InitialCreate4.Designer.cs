@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PunkteSystem.EFCore;
@@ -11,9 +12,11 @@ using PunkteSystem.EFCore;
 namespace PunkteSystem.Migrations
 {
     [DbContext(typeof(SchwimmerContext))]
-    partial class SchwimmerContextModelSnapshot : ModelSnapshot
+    [Migration("20250505193346_InitialCreate4")]
+    partial class InitialCreate4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
