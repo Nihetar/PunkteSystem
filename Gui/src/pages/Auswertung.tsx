@@ -1,52 +1,83 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Container,
+  Box,
   Typography,
   Table,
-  TableHead,
   TableBody,
+  TableCell,
+  TableHead,
   TableRow,
-  TableCell
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material';
-import { SchwimmerDto } from '../SchwimmerDto';
-import { calculatePointsForSwimmer } from '../punkte/PunkteCalculator';
-import { request } from '../request';
+import { getAllSchwimmer } from '../request';
+import { SiteMap } from './SiteMap';
 
-export const AuswertungPage: React.FC = () => {
-  const [swimmers, setSwimmers] = useState<SchwimmerDto[]>([]);
+interface Schwimmer {
+  id: number;
+  name: string;
+  gruppe: string;
+  brust: Record<string, boolean>;
+  kraul: Record<string, boolean>;
+  ruecken: Record<string, boolean>;
+}
+
+const schwimmstile = ['brust', 'kraul', 'ruecken'] as const;
+type Schwimmstil = typeof schwimmstile[number];
+
+export function Auswertung() {
+  const [data, setData] = useState<Schwimmer[]>([]);
+  const [stil, setStil] = useState<Schwimmstil>('brust');
 
   useEffect(() => {
-    async function data() {
-    setSwimmers(await request<SchwimmerDto[]>('schwimmer', 'GET'));;
-    }
-    data();
+    getAllSchwimmer()
+      .then(setData)
+      .catch(err => console.error('Ladefehler:', err));
   }, []);
 
-  const withPoints = swimmers.map(s => ({ ...s, punkte: calculatePointsForSwimmer(s) }));
-  // Sortierung aufsteigend
-  const sorted = withPoints.sort((a, b) => a.punkte - b.punkte);
+  const getFehlerAnzahl = (werte: Record<string, boolean>) => {
+    return Object.values(werte).filter(v => v).length;
+  };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Auswertung
-      </Typography>
+    <Box p={4}>
+      <SiteMap />
+      <Typography variant="h5" gutterBottom>Auswertung der Schwimmstile</Typography>
+
+      <FormControl sx={{ mb: 3, minWidth: 200 }}>
+        <InputLabel id="stil-label">Schwimmstil</InputLabel>
+        <Select
+          labelId="stil-label"
+          value={stil}
+          label="Schwimmstil"
+          onChange={e => setStil(e.target.value as Schwimmstil)}
+        >
+          {schwimmstile.map(s => (
+            <MenuItem key={s} value={s}>{s.toUpperCase()}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Schwimmer</TableCell>
-            <TableCell align="right">Punkte</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Gruppe</TableCell>
+            <TableCell>Fehleranzahl</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {sorted.map(s => (
+          {data.map(s => (
             <TableRow key={s.id}>
               <TableCell>{s.name}</TableCell>
-              <TableCell align="right">{s.punkte}</TableCell>
+              <TableCell>{s.gruppe}</TableCell>
+              <TableCell>{getFehlerAnzahl(s[stil])}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </Container>
+    </Box>
   );
 };

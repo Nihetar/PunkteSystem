@@ -32,6 +32,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
 });
 
+app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 

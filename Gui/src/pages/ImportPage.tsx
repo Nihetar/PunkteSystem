@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Select,
@@ -13,8 +13,8 @@ import {
   TableBody,
   Typography
 } from '@mui/material';
-import { getAllSchwimmer, updateSchwimmer } from '../request';
 import { SiteMap } from './SiteMap';
+import { getAllSchwimmer, updateSchwimmer } from '../request';
 
 interface Schwimmer {
   id: number;
@@ -28,7 +28,7 @@ interface Schwimmer {
 const schwimmstile = ['brust', 'kraul', 'ruecken'] as const;
 type Schwimmstil = typeof schwimmstile[number];
 
-export function SchwimmerUpdate() {
+const SchwimmerUpdate: React.FC = () => {
   const [data, setData] = useState<Schwimmer[]>([]);
   const [stil, setStil] = useState<Schwimmstil>('brust');
 
@@ -38,18 +38,17 @@ export function SchwimmerUpdate() {
       .catch(err => console.error('Ladefehler:', err));
   }, []);
 
-  const handleCheckboxChange = async (id: number, field: string, checked: boolean) => {
+  const handleCheckboxChange = (id: number, field: string, checked: boolean) => {
     const updated = data.map(s => {
       if (s.id === id) {
         const updatedStyle = { ...s[stil], [field]: checked };
         const updatedSchwimmer = { ...s, [stil]: updatedStyle };
+        updateSchwimmer(id, updatedSchwimmer).catch(console.error);
         return updatedSchwimmer;
       }
       return s;
     });
     setData(updated);
-    const toUpdate = updated.find(s => s.id === id);
-    if (toUpdate) await updateSchwimmer(id, toUpdate);
   };
 
   return (
@@ -101,3 +100,5 @@ export function SchwimmerUpdate() {
     </Box>
   );
 };
+
+export default SchwimmerUpdate;
