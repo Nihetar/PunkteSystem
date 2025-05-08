@@ -1,4 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { SchwimmerDto } from './SchwimmerDto';
+import { GruppeDto } from './GruppenDto';
 
 const api = axios.create({
   baseURL: 'https://localhost:7075/api',
@@ -28,34 +30,30 @@ api.interceptors.response.use(
   }
 );
 
-export const saveSwimmingData = async (inputText: string): Promise<void> => {
-  try {
-    await api.post('/Schwimmer/SaveSwimmingData', inputText);
-  } catch (error) {
-    console.error('Fehler beim Speichern:', error);
-    throw error;
-  }
+export const saveSwimmingData = async (input: { text: string }): Promise<void> => {
+  await api.post<void>('/Schwimmer/SaveSwimmingData', input);
 };
 
-export const getAllSchwimmer = async () => {
-  const response = await api.get('/Schwimmer');
+export const getAllSchwimmer = async (): Promise<SchwimmerDto[]> => {
+  const response: AxiosResponse<SchwimmerDto[]> = await api.get<SchwimmerDto[]>('/Schwimmer');
   return response.data;
 };
 
-export const updateSchwimmer = async (id: number, schwimmer: any) => {
-  await api.put(`/Schwimmer/${id}`, schwimmer);
+export const updateSchwimmer = async (id: number, schwimmer: SchwimmerDto): Promise<void> => {
+  await api.put<void>(`/Schwimmer/${id}`, schwimmer);
 };
 
-export const getAllGroups = async () => {
-  const response = await api.get('/Gruppen');
-  return response.data;
+export const getAllGroups = async (): Promise<GruppeDto[]> => {
+  const resp = await api.get<GruppeDto[]>('/Gruppen');
+  return resp.data;
 };
 
-export const createGroup = async (group: { name: string }) => {
-  const response = await api.post('/Gruppen', group);
-  return response.data;
+export const createGroup = async (group: { name: string }): Promise<GruppeDto> => {
+  const resp = await api.post<GruppeDto>('/Gruppen', group);
+  return resp.data;
 };
 
-export const updateGroupSwimmers = async (groupId: number, swimmerIds: number[]) => {
-  await api.put(`/Gruppen/${groupId}/swimmers`, swimmerIds);
+export const updateGroupSwimmers = async (groupId: number, swimmerIds: number[]): Promise<void> => {
+  await api.put<void>(`/Gruppen/${groupId}/swimmers`, swimmerIds);
 };
+

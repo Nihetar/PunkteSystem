@@ -16,24 +16,13 @@ import {
 } from '@mui/material';
 import { getAllSchwimmer, updateSchwimmer } from '../request';
 import { SiteMap } from './SiteMap';
-
-interface Schwimmer {
-  id: number;
-  vorname: string;
-  nachname: string;
-  geburtsdatum: string;
-  gruppe: string;
-  brust: Record<string, boolean>;
-  kraul: Record<string, boolean>;
-  ruecken: Record<string, boolean>;
-  grundfertigkeiten: Record<string, boolean>;
-}
+import { SchwimmerDto } from '../SchwimmerDto';
 
 const kategorien = ['brust', 'kraul', 'ruecken', 'grundfertigkeiten'] as const;
 type Kategorie = typeof kategorien[number];
 
 export function UpdatePage() {
-  const [data, setData] = useState<Schwimmer[]>([]);
+  const [data, setData] = useState<SchwimmerDto[]>([]);
   const [changed, setChanged] = useState<Set<number>>(new Set());
   const [stil, setStil] = useState<Kategorie>('brust');
   const [gruppen, setGruppen] = useState<string[]>([]);
@@ -41,13 +30,14 @@ export function UpdatePage() {
 
   useEffect(() => {
     getAllSchwimmer()
-      .then(schwimmer => {
+      .then((schwimmer: SchwimmerDto[]) => {
         setData(schwimmer);
-        const gruppenSet = new Set<string>(schwimmer.map(s => s.gruppe));
+        const gruppenSet = new Set<string>(schwimmer.map((s: SchwimmerDto) => s.gruppe));
         setGruppen(Array.from(gruppenSet));
       })
       .catch(err => console.error('Ladefehler:', err));
   }, []);
+  
 
   const handleCheckboxChange = (id: number, field: string, checked: boolean) => {
     const updated = data.map(s => {

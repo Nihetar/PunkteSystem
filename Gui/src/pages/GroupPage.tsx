@@ -11,24 +11,14 @@ import {
 } from '@mui/material';
 import { getAllSchwimmer, getAllGroups, createGroup, updateGroupSwimmers } from '../request';
 import { SiteMap } from './SiteMap';
+import { GruppeDto } from '../GruppenDto';
+import { SchwimmerDto } from '../SchwimmerDto';
 
-interface Schwimmer {
-  id: number;
-  vorname: string;
-  nachname: string;
-  gruppenId: number;
-}
-
-interface Gruppe {
-  id: number;
-  name: string;
-  schwimmer: Schwimmer[];
-}
 
 export function GroupPage() {
   const [groupName, setGroupName] = useState('');
-  const [groups, setGroups] = useState<Gruppe[]>([]);
-  const [swimmers, setSwimmers] = useState<Schwimmer[]>([]);
+  const [groups, setGroups] = useState<GruppeDto[]>([]);
+  const [swimmers, setSwimmers] = useState<SchwimmerDto[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [selectedSwimmerIds, setSelectedSwimmerIds] = useState<number[]>([]);
 

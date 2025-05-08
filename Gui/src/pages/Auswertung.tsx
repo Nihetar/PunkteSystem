@@ -10,20 +10,10 @@ import {
 } from '@mui/material';
 import { getAllSchwimmer } from '../request';
 import { SiteMap } from './SiteMap';
-
-interface Schwimmer {
-  id: number;
-  vorname: string;
-  nachname: string;
-  geburtsdatum: string;
-  gruppe: string;
-  brust: Record<string, boolean>;
-  kraul: Record<string, boolean>;
-  ruecken: Record<string, boolean>;
-}
+import { SchwimmerDto } from '../SchwimmerDto';
 
 export function Auswertung() {
-  const [data, setData] = useState<Schwimmer[]>([]);
+  const [data, setData] = useState<SchwimmerDto[]>([]);
 
   useEffect(() => {
     getAllSchwimmer()

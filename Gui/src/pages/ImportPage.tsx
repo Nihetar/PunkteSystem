@@ -10,7 +10,7 @@ export function ImportPage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await saveSwimmingData(inputText);
+      await saveSwimmingData({ text: inputText });
       setInputText('');
     } catch {
       // Fehlerbehandlung könnte hier hinzugefügt werden
