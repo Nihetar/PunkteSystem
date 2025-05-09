@@ -1,18 +1,70 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:latest
-    platform: linux/amd64
-    container_name: punkte_postgres
+  # PostgreSQL-Datenbank
+  postgres:
+    image: postgres:15
+    container_name: punkte-postgres
     environment:
-      POSTGRES_DB: PunkteDatabase
-      POSTGRES_USER: PunkteUSer
-      POSTGRES_PASSWORD: Tv#Babenhausen
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Tv#Babenhausen  # Ändern!
+      POSTGRES_DB: punkte_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Nur für Debugging (externer Zugriff)
+    restart: unless-stopped
+    networks:
+      - punkte-network
+
+  # ASP.NET Core Backend
+  backend:
+    build:
+      context: ./PunkteSystem
+      dockerfile: Dockerfile.backend
+    container_name: punkte-backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=punkte_db;Username=postgres;Password=Tv#Babenhausen"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5000:80"
+    restart: unless-stopped
+    networks:
+      - punkte-network
+
+  # React Frontend (NGINX)
+  frontend:
+    build:
+      context: ./punkte-system-frontend
+      dockerfile: Dockerfile.frontend
+    container_name: punkte-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - punkte-network
+
+  # Healthcheck für PostgreSQL (optional)
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - punkte-network
 
 volumes:
   postgres_data:
+
+networks:
+  punkte-network:
+    driver: bridge
